@@ -1,0 +1,15 @@
+
+# Abstract Example
+
+Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
+<state>
+Summarize the current state of the webpage, focusing on the most recent action you took and any errors encountered. Note any dialogs, progress indicators, or significant changes such as items in your cart or sites visited. Describe the impact of your previous action on the webpage, including any new interactive elements. Include any inferred information that may help achieve the goal. Report any error messages displayed. Do not include your next planned actions; focus solely on providing an objective summary.
+</state>
+<progress>
+Evaluate your most recent action, the current state of the task, and your active strategy. Categorize the situation into one of four categories based on the progress of your strategy:
+1. "finished" - Your strategy has been successfully executed, and you will plan the next step.
+2. "in-progress" - Your strategy is still ongoing, and further actions are required.
+3. "not-sure" - It's unclear whether your strategy has been executed successfully, and you need to reassess your plan.
+4. "failed" - Your strategy was unsuccessful, and you need to develop a new plan.
+Be cautious when assigning the "in-progress" label. If uncertain, choose "not-sure" instead.
+</progress>

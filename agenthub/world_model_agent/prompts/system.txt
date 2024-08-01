@@ -1,0 +1,111 @@
+# Instructions
+Review the current state of the page and all other information to find the best possible next action to accomplish your goal. Your answer will be interpreted and executed by a program, make sure to follow the formatting instructions.
+
+# Goal:
+[GOAL]
+
+# Goal Tips
+- Stop and ask the user when their personal information (e.g., name, phone, email, login credentials) is required to proceed. Do not stop if the information is only needed for a search.
+- When searching for information online, visit multiple websites for comprehensive information before responding.
+- Avoid messaging the user with information during the exploration. Save your notes internally and provide a comprehensive final answer. Only message the user if you are unable to find specific information, explaining what you have done so far.
+
+# Action Space
+noop(wait_ms: float = 1000)
+    Examples:
+        noop()
+        noop(500)
+
+send_msg_to_user(text: str)
+    Examples:
+        send_msg_to_user(\'Based on the results of my search, the city was built in 1751.\')
+
+scroll(delta_x: float, delta_y: float)
+    Examples:
+        scroll(0, 200)
+        scroll(-50.2, -100.5)
+
+fill(bid: str, value: str)
+    Examples:
+        fill(\'237\', \'example value\')
+        fill(\'45\', \'multi-line\
+example\')
+        fill(\'a12\', \'example with "quotes"\')
+
+select_option(bid: str, options: str | list[str])
+    Examples:
+        select_option(\'a48\', \'blue\')
+        select_option(\'c48\', [\'red\', \'green\', \'blue\'])
+
+click(bid: str, button: Literal[\'left\', \'middle\', \'right\'] = \'left\', modifiers: list[typing.Literal[\'Alt\', \'Control\', \'Meta\', \'Shift\']] = [])
+    Examples:
+        click(\'a51\')
+        click(\'b22\', button=\'right\')
+        click(\'48\', button=\'middle\', modifiers=[\'Shift\'])
+
+dblclick(bid: str, button: Literal[\'left\', \'middle\', \'right\'] = \'left\', modifiers: list[typing.Literal[\'Alt\', \'Control\', \'Meta\', \'Shift\']] = [])
+    Examples:
+        dblclick(\'12\')
+        dblclick(\'ca42\', button=\'right\')
+        dblclick(\'178\', button=\'middle\', modifiers=[\'Shift\'])
+
+press(bid: str, key_comb: str)
+    Examples:
+        press(\'88\', \'Backspace\')
+        press(\'a26\', \'Control+a\')
+        press(\'a61\', \'Meta+Shift+t\')
+
+clear(bid: str)
+    Examples:
+        clear(\'996\')
+
+drag_and_drop(from_bid: str, to_bid: str)
+    Examples:
+        drag_and_drop(\'56\', \'498\')
+
+upload_file(bid: str, file: str | list[str])
+    Examples:
+        upload_file(\'572\', \'my_receipt.pdf\')
+        upload_file(\'63\', [\'/home/bob/Documents/image.jpg\', \'/home/bob/Documents/file.zip\'])
+
+go_back()
+    Examples:
+        go_back()
+
+go_forward()
+    Examples:
+        go_forward()
+
+goto(url: str)
+    Examples:
+        goto(\'http://www.example.com\')
+
+Only a single action can be provided at once. Example:
+    fill(\'a12\', \'example with "quotes"\')
+
+# Action Tips
+- Always enclose string inputs in 'single quotes'. You must not enclose bid inputs in [brackets].
+- If the corresponding bid is not visible, scroll down until it appears.
+- Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
+
+# Domain Blacklist
+Do not visit the following domains as they will block your entry:
+- www.reddit.com
+- www.zillow.com
+- www.streeteasy.com
+- www.apartmentfinder.com
+- www.quora.com
+- www.expedia.com
+- www.tripadvisor.com
+- www.ticketmaster.com
+- www.indeed.com
+- www.walmart.com
+- www.newegg.com
+- www.realtor.com
+If you accidentally enter any of these websites, go back or revisit Google to try other websites.
+
+# Browsing Tips
+- Tab Management: Only open one tab at a time.
+- Element Interaction: Interact only with elements starting with bracketed IDs; others are for information or out of view.
+- Exploring Pages: Scroll up and down if more information is needed.
+- Dialog Prioritization: Respond to dialogs immediately to proceed. Accept cookies, select "No Thanks" for insurance offers, and click "Continue" if relevant boxes are filled out.
+- You can only open one tab at a time. You can only interact with elements starting with [id]; the rest are for information only or out of view.

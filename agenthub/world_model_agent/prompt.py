@@ -1,4 +1,5 @@
 import abc
+from pathlib import Path
 import platform
 
 from browsergym.core.action.base import AbstractActionSet
@@ -9,6 +10,8 @@ from .utils import (
     parse_html_tags_raise,
 )
 
+CURRENT_DIR = Path(__file__).resolve().parent
+PROMPTS_DIR = f"{CURRENT_DIR}/prompts"
 
 class PromptElement:
     """Base class for all prompt elements. Prompt elements can be hidden.
@@ -426,35 +429,11 @@ class MyMainPrompt(PromptElement):
 {self.history}\
 {self.obs}\
 """
+        with open(f"{PROMPTS_DIR}/effectuator-abs.txt") as f:
+            prompt += f.read()
 
-        prompt += """
-# Abstract Example
-
-Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
-<explanation>
-Describe what the action to be taken is trying to do using a single concise sentence. Break down the active strategy into individual, manageable actions. Avoid long, complex search terms. Focus on the single action. Use first-person perspective like "I am doing something." If you encounter trouble using the search button, try hitting enter on the search box instead. If you have trouble clicking on something, try scrolling down by 500 pixels first. Use clear and simple language to detail each step.
-</explanation>
-
-<action>
-Based on the current observation, state, active strategy, and action history, select one single action to be executed. Use only one action at a time. You must not enclose bid inputs in [brackets]. Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
-</action>
-"""
-
-        prompt += """
-# Concrete Example
-
-Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
-<explanation>
-I am filling out the textbox for Date with 'example with "quotes"'
-</explanation>
-
-<action>
-fill('32-12', 'example with "quotes"')
-</action>
-
-"""
-
-        # prompt = self.add_screenshot(prompt)
+        with open(f"{PROMPTS_DIR}/effectuator-con.txt") as f:
+            prompt += f.read()
 
         return prompt
 
@@ -466,48 +445,11 @@ fill('32-12', 'example with "quotes"')
 {self.active_strategy}
 """
 
-        prompt += """
-# Abstract Example
+        with open(f"{PROMPTS_DIR}/encoder-abs.txt") as f:
+            prompt += f.read()
 
-Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
-<state>
-Summarize the current state of the webpage, focusing on the most recent action you took and any errors encountered. Note any dialogs, progress indicators, or significant changes such as items in your cart or sites visited. Describe the impact of your previous action on the webpage, including any new interactive elements. Include any inferred information that may help achieve the goal. Report any error messages displayed. Do not include your next planned actions; focus solely on providing an objective summary.
-</state>\
-
-<progress>
-Evaluate your most recent action, the current state of the task, and your active strategy. Categorize the situation into one of four categories based on the progress of your strategy:
-1. "finished" - Your strategy has been successfully executed, and you will plan the next step.
-2. "in-progress" - Your strategy is still ongoing, and further actions are required.
-3. "not-sure" - It's unclear whether your strategy has been executed successfully, and you need to reassess your plan.
-4. "failed" - Your strategy was unsuccessful, and you need to develop a new plan.
-Be cautious when assigning the "in-progress" label. If uncertain, choose "not-sure" instead.
-</progress>
-"""
-
-        prompt += """
-# Concrete Example
-
-Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
-<state>
-The previous action resulted in a timeout error, indicating no changes were made to the page. Thus far, I have visited ABC.com and DEF.com, discovering information G and H, respectively. The current page contains a dialog with id 789 prompting whether to add protection, offering coverage options and the choices "Add Protection" or "No Thanks". A link with id 234 indicates "1 item in cart", revealing a cellphone in the cart with a subtotal of $345. I searched for a 5-night hotel stay, but results only showed availability for a 6-night stay, suggesting a 5-night stay is unavailable. The page displays:
-- An empty textbox with id 123 labeled "Date", indicating it is likely for date input.
-- A button with id 456 labeled "Submit" positioned below textbox 123, suggesting it submits the date entered in the textbox.
-Additionally, there are:
-- A notification with id 101 displaying "Error: Invalid date format" when attempting to submit the date.
-- A dropdown menu with id 102 labeled "Room Type" containing options "Single", "Double", and "Suite".
-- A section with id 103 showing "Total Price: $0.00", implying the total cost updates dynamically based on selections.
-The page did not display any new errors after the latest action, apart from the timeout issue.
-I clicked the "Submit" button on the booking form, but no confirmation message appeared, and the page did not change. There is no indication whether the submission was successful or not. I need to reassess the page for any subtle changes or possible errors.
-</state>\
-
-<progress>
-not-sure
-</progress>
-"""
-
-        # foo = 'Include details such as accessibility tree id when describing elements on the page.'
-
-        # prompt = self.add_screenshot(prompt)
+        with open(f"{PROMPTS_DIR}/encoder-con.txt") as f:
+            prompt += f.read()
 
         return prompt
 
@@ -517,115 +459,103 @@ not-sure
 {self.obs}\
 """
 
-        prompt += """
-# Abstract Example
+        with open(f"{PROMPTS_DIR}/policy-abs.txt") as f:
+            prompt += f.read()
 
-Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
-<strategy>
-Given that previous actions have been completed and the environment has transitioned to the current inferred state, describe the next action to achieve the goal. Break down the goal into clear, manageable steps. Avoid using phrases such as "To accomplish the goal," "I will," "To proceed," or "Assume the previous strategies have been carried out." Refrain from mentioning specific element IDs as they may change during execution. Limit your response to one sentence and include any details that help select the correct action. Be creative and propose novel methods to achieve the goal. Avoid creating accounts without user permission or providing personal information.
-</strategy>
-"""
-
-        prompt += """
-# Concrete Example
-
-Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
-<strategy>
-Click through the form fields to explore available options and ensure all mandatory fields are completed.
-</strategy>
-"""
+        with open(f"{PROMPTS_DIR}/policy-con.txt") as f:
+            prompt += f.read()
 
         # prompt = self.add_screenshot(prompt)
 
         return prompt
 
-    def get_dynamics_prompt(self) -> str:
-        prompt = f"""\
-{self.obs}\
-"""
+#     def get_dynamics_prompt(self) -> str:
+#         prompt = f"""\
+# {self.obs}\
+# """
 
-        prompt += """
-# Abstract Example
+#         prompt += """
+# # Abstract Example
 
-Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your
-answer:
-<next_state>
-Assume the environment is at the current inferred state and your proposed strategy has been applied. Predict the new state of the webpage after executing each part of the proposed strategy. Describe the expected changes in page content, any new information relevant to your goal, and how interactive elements might change. Pay close attention to how the details of elements will be altered. Identify the new elements you can interact with on the updated webpage.
-</next_state>\
+# Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your
+# answer:
+# <next_state>
+# Assume the environment is at the current inferred state and your proposed strategy has been applied. Predict the new state of the webpage after executing each part of the proposed strategy. Describe the expected changes in page content, any new information relevant to your goal, and how interactive elements might change. Pay close attention to how the details of elements will be altered. Identify the new elements you can interact with on the updated webpage.
+# </next_state>\
 
-<progress>
-Evaluate the previous and current states of the browser environment. Classify your status into one of three categories based on your progress towards the goal:
+# <progress>
+# Evaluate the previous and current states of the browser environment. Classify your status into one of three categories based on your progress towards the goal:
 
-"in-progress" - You are still working towards achieving the goal.
-"not-sure" - It's unclear if the goal has been achieved.
-"goal-reached" - You have successfully completed the goal.
-</progress>
-"""
+# "in-progress" - You are still working towards achieving the goal.
+# "not-sure" - It's unclear if the goal has been achieved.
+# "goal-reached" - You have successfully completed the goal.
+# </progress>
+# """
 
-        prompt += """
-# Concrete Example
+#         prompt += """
+# # Concrete Example
 
-Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
-<next_state>
-A dropdown menu appears below the textbox, listing various predefined options based on the initial input.
-The textbox now contains the text "quote" and displays suggested completions as a dropdown list.
-The page shows:
-- A textbox labeled "quote" filled with the text "quote on."
-- A dropdown list beneath the textbox containing items such as "quote on insurance," "quote on travel," and "quote on booking," each selectable.
-- A "Submit" button below the textbox, which can be clicked to submit the selected or typed input to the backend.
-- A notification area above the form indicating any immediate feedback or errors from previous actions, currently displaying "Please complete all required fields."
-- Additional form fields dynamically appearing based on previous selections, such as a date picker or additional textboxes for more specific information related to the chosen quote option.
-I have filled out most of the booking form but still need to select a room type before submission. The form fields are populated, but the "Submit" button remains inactive until all required fields are completed.
-</next_state>\
+# Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
+# <next_state>
+# A dropdown menu appears below the textbox, listing various predefined options based on the initial input.
+# The textbox now contains the text "quote" and displays suggested completions as a dropdown list.
+# The page shows:
+# - A textbox labeled "quote" filled with the text "quote on."
+# - A dropdown list beneath the textbox containing items such as "quote on insurance," "quote on travel," and "quote on booking," each selectable.
+# - A "Submit" button below the textbox, which can be clicked to submit the selected or typed input to the backend.
+# - A notification area above the form indicating any immediate feedback or errors from previous actions, currently displaying "Please complete all required fields."
+# - Additional form fields dynamically appearing based on previous selections, such as a date picker or additional textboxes for more specific information related to the chosen quote option.
+# I have filled out most of the booking form but still need to select a room type before submission. The form fields are populated, but the "Submit" button remains inactive until all required fields are completed.
+# </next_state>\
 
-<progress>
-in-progress
-</progress>
-"""
+# <progress>
+# in-progress
+# </progress>
+# """
 
-        # prompt = self.add_screenshot(prompt)
+#         # prompt = self.add_screenshot(prompt)
 
-        return prompt
+#         return prompt
 
-    def get_action_reward_prompt(self) -> str:
-        prompt = f"""\
-{self.obs}\
-"""
+#     def get_action_reward_prompt(self) -> str:
+#         prompt = f"""\
+# {self.obs}\
+# """
 
-        prompt += """
-# Abstract Example
+#         prompt += """
+# # Abstract Example
 
-Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
-<think>
-Observe your current state and proposed strategy in the browser environment, classify the proposed strategy into one of four categories based on progress towards your goal. The categories are:
+# Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
+# <think>
+# Observe your current state and proposed strategy in the browser environment, classify the proposed strategy into one of four categories based on progress towards your goal. The categories are:
 
-1. "towards-the-goal" - You are moving closer to achieving the goal.
-2. "not-sure" - It's unclear if the action are helping reach the goal.
-3. "away-from-the-goal" - Your actions are diverting from the goal.
+# 1. "towards-the-goal" - You are moving closer to achieving the goal.
+# 2. "not-sure" - It's unclear if the action are helping reach the goal.
+# 3. "away-from-the-goal" - Your actions are diverting from the goal.
 
-Explain your reasoning here.
-</think>\
+# Explain your reasoning here.
+# </think>\
 
-<response>
-"towards-the-goal", "not-sure", or "away-from-the-goal"
-You should be extra-careful when assigning "towards-the-goal" labels. If you are unsure, please select "not-sure" instead.
-</response>
-"""
+# <response>
+# "towards-the-goal", "not-sure", or "away-from-the-goal"
+# You should be extra-careful when assigning "towards-the-goal" labels. If you are unsure, please select "not-sure" instead.
+# </response>
+# """
 
-        prompt += """
-# Concrete Example
+#         prompt += """
+# # Concrete Example
 
-Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
-<think>
-The proposed action clicks the "Submit" button with 123 without filling out the form above it. It will likely encounter an error, moving away from the goal.
-</think>\
+# Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
+# <think>
+# The proposed action clicks the "Submit" button with 123 without filling out the form above it. It will likely encounter an error, moving away from the goal.
+# </think>\
 
-<response>
-away-from-the-goal
-</response>
-"""
+# <response>
+# away-from-the-goal
+# </response>
+# """
 
-        return prompt
+#         return prompt
 
     def _parse_effectuator_answer(self, text_answer):
         ans_dict = {}
@@ -668,26 +598,26 @@ away-from-the-goal
         )
         return ans_dict
 
-    def _parse_dynamics_answer(self, text_answer):
-        ans_dict = {}
-        ans_dict.update(
-            parse_html_tags_raise(
-                text_answer, keys=['next_state', 'progress'], merge_multiple=True
-            )
-        )
-        return ans_dict
+    # def _parse_dynamics_answer(self, text_answer):
+    #     ans_dict = {}
+    #     ans_dict.update(
+    #         parse_html_tags_raise(
+    #             text_answer, keys=['next_state', 'progress'], merge_multiple=True
+    #         )
+    #     )
+    #     return ans_dict
 
-    def _parse_action_reward_answer(self, text_answer):
-        ans_dict = {}
-        ans_dict.update(
-            parse_html_tags_raise(
-                text_answer, optional_keys=['think'], merge_multiple=True
-            )
-        )
-        ans_dict.update(
-            parse_html_tags_raise(text_answer, keys=['response'], merge_multiple=True)
-        )
-        return ans_dict
+    # def _parse_action_reward_answer(self, text_answer):
+    #     ans_dict = {}
+    #     ans_dict.update(
+    #         parse_html_tags_raise(
+    #             text_answer, optional_keys=['think'], merge_multiple=True
+    #         )
+    #     )
+    #     ans_dict.update(
+    #         parse_html_tags_raise(text_answer, keys=['response'], merge_multiple=True)
+    #     )
+    #     return ans_dict
 
 
 if __name__ == '__main__':

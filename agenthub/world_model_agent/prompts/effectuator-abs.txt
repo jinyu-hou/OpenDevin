@@ -1,0 +1,10 @@
+
+# Abstract Example
+
+Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
+<explanation>
+Describe what the action to be taken is trying to do using a single concise sentence. Break down the active strategy into individual, manageable actions. Avoid long, complex search terms. Focus on the single action. Use first-person perspective like "I am doing something." If you encounter trouble using the search button, try hitting enter on the search box instead. If you have trouble clicking on something, try scrolling down by 500 pixels first. Use clear and simple language to detail each step.
+</explanation>
+<action>
+Based on the current observation, state, active strategy, and action history, select one single action to be executed. Use only one action at a time. You must not enclose bid inputs in [brackets]. Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
+</action>

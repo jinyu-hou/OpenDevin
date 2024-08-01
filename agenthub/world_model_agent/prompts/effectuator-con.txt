@@ -1,0 +1,10 @@
+
+# Concrete Example
+
+Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
+<explanation>
+I am filling out the textbox for Date with 'example with "quotes"'
+</explanation>
+<action>
+fill('32-12', 'example with "quotes"')
+</action>

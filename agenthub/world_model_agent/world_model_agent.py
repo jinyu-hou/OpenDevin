@@ -7,6 +7,7 @@ import math
 # import multiprocess as mp
 import multiprocessing.dummy as mp_dummy
 import os
+from pathlib import Path
 import random
 import time
 import traceback
@@ -37,6 +38,9 @@ from opendevin.runtime.tools import RuntimeTool
 
 from .prompt import MyMainPrompt
 from .utils import ParseError
+
+CURRENT_DIR = Path(__file__).resolve().parent
+PROMPTS_DIR = f"{CURRENT_DIR}/prompts"
 
 USE_NAV = (
     os.environ.get('USE_NAV', 'true') == 'true'
@@ -266,96 +270,11 @@ class WorldModelAgent(Agent):
         raise ValueError(f'Could not parse a valid value after {n_retry} retries.')
 
     def get_llm_output(self, prompt, parse_func, output_keys, override_llm=False):
-        #         system_msg = f"""\
-        # # Instructions
-        # Review the current state of the page and all other information to find the best possible next action to accomplish your goal. Your answer will be interpreted and executed by a program, make sure to follow the formatting instructions.
+        
+        system_msg = ""
+        with open(f"{PROMPTS_DIR}/system.txt") as f:
+            system_msg += f.read()
 
-        # # Goal:
-        # {self.goal}
-        # Stop and ask the user when contact or personal information is required to proceed
-        # with the task.
-
-        # # Action Space
-        # {self.action_space.describe(with_long_description=False, with_examples=True)}
-
-        # # Note 1
-        # You should not attempt to visit the following domains as they will block your entry:
-        # - Reddit: www.reddit.com
-        # - Zillow: www.zillow.com
-        # - StreetEasy: www.streeteasy.com
-
-        # # Note 2
-        # You should not attempt to enter personal information unless the user tells you to.
-        # If you encounter a situation where you need to enter personal information, stop and
-        # ask the user to supply it.
-        # """
-        #         addition = """
-        # Stop and ask the user when their own information is required to proceed with the task, like name, phone, email, login credentials, and more. Do not stop if the information is what you need to search for."""
-        system_msg = f"""\
-# Instructions
-Review the current state of the page and all other information to find the best possible next action to accomplish your goal. Your answer will be interpreted and executed by a program, make sure to follow the formatting instructions.
-
-# Goal:
-{self.goal}
-
-# Goal Tips
-- Stop and ask the user when their personal information (e.g., name, phone, email, login credentials) is required to proceed. Do not stop if the information is only needed for a search.
-- When searching for information online, visit multiple websites for comprehensive information before responding.
-- Avoid messaging the user with information during the exploration. Save your notes internally and provide a comprehensive final answer. Only message the user if you are unable to find specific information, explaining what you have done so far.
-
-# Action Space
-{self.action_space.describe(with_long_description=False, with_examples=True)}
-
-# Action Tips
-- Always enclose string inputs in 'single quotes'. You must not enclose bid inputs in [brackets].
-- If the corresponding bid is not visible, scroll down until it appears.
-- Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
-
-# Domain Blacklist
-Do not visit the following domains as they will block your entry:
-- www.reddit.com
-- www.zillow.com
-- www.streeteasy.com
-- www.apartmentfinder.com
-- www.quora.com
-- www.expedia.com
-- www.tripadvisor.com
-- www.ticketmaster.com
-- www.indeed.com
-- www.walmart.com
-- www.newegg.com
-- www.realtor.com
-If you accidentally enter any of these websites, go back or revisit Google to try other websites.
-
-# Browsing Tips
-- Tab Management: Only open one tab at a time.
-- Element Interaction: Interact only with elements starting with bracketed IDs; others are for information or out of view.
-- Exploring Pages: Scroll up and down if more information is needed.
-- Dialog Prioritization: Respond to dialogs immediately to proceed. Accept cookies, select "No Thanks" for insurance offers, and click "Continue" if relevant boxes are filled out.
-- You can only open one tab at a time. You can only interact with elements starting with [id]; the rest are for information only or out of view.
-"""
-        #         scrolling_prompt = """
-        # scroll(delta_x: float, delta_y: float)
-        #     Examples:
-        #         scroll(0, 200)
-
-        #         scroll(-50.2, -100.5)
-        # """
-        #         system_msg = system_msg.replace(scrolling_prompt, '')
-
-        focus_prompt = """
-focus(bid: str)
-    Examples:
-        focus('b455')
-"""
-        system_msg = system_msg.replace(focus_prompt, '')
-
-        hover_prompt = """
-hover(bid: str)
-    Examples:
-        hover('b8')
-"""
-        system_msg = system_msg.replace(hover_prompt, '')
         # print(system_msg)
         messages = []
         messages.append({'role': 'system', 'content': system_msg})
@@ -396,13 +315,16 @@ hover(bid: str)
     def encoder(self, main_prompt):
         prompt = main_prompt.get_encoder_prompt()
         ans_dict = self.get_llm_output(
-            prompt, main_prompt._parse_encoder_answer, ['state', 'progress']
+            prompt, main_prompt._parse_encoder_answer, 
+            # ['state', 'progress'],
+            ['state'],
         )
 
-        think = ans_dict.get('think')
-        replan = ans_dict['progress'] in ['finished', 'failed', 'not-sure']
+        # think = ans_dict.get('think')
+        # replan = ans_dict['progress'] in ['finished', 'failed', 'not-sure']
 
-        return ans_dict['state'], ans_dict['progress'], replan, think
+        # return ans_dict['state'], ans_dict['progress'], replan, think
+        return ans_dict['state']
 
     def policy(self, main_prompt):
         prompt = main_prompt.get_policy_prompt()
@@ -418,28 +340,31 @@ hover(bid: str)
     def dynamics(self, main_prompt):
         prompt = main_prompt.get_dynamics_prompt()
         ans_dict = self.get_llm_output(
-            prompt, main_prompt._parse_dynamics_answer, ['next_state', 'progress']
+            prompt, main_prompt._parse_dynamics_answer, 
+            # ['next_state', 'progress'],
+            ['next_state'],
         )
 
-        is_terminal = ans_dict['progress'] == 'goal-reached'
-        return ans_dict['next_state'], ans_dict['progress'], is_terminal
+        # is_terminal = ans_dict['progress'] == 'goal-reached'
+        # return ans_dict['next_state'], ans_dict['progress'], is_terminal
+        return ans_dict['next_state']
 
-    def action_reward(self, main_prompt):
-        prompt = main_prompt.get_action_reward_prompt()
-        ans_dict = self.get_llm_output(
-            prompt, main_prompt._parse_action_reward_answer, ['response']
-        )
+    # def action_reward(self, main_prompt):
+    #     prompt = main_prompt.get_action_reward_prompt()
+    #     ans_dict = self.get_llm_output(
+    #         prompt, main_prompt._parse_action_reward_answer, ['response']
+    #     )
 
-        think = ans_dict.get('think')
-        response = ans_dict['response']
-        reward = (
-            -1
-            if response == 'away-from-the-goal'
-            else 1
-            if response == 'towards-the-goal'
-            else 0
-        )
-        return reward, think, response
+    #     think = ans_dict.get('think')
+    #     response = ans_dict['response']
+    #     reward = (
+    #         -1
+    #         if response == 'away-from-the-goal'
+    #         else 1
+    #         if response == 'towards-the-goal'
+    #         else 0
+    #     )
+    #     return reward, think, response
 
     def effectuator(self, main_prompt):
         prompt = main_prompt.get_effectuator_prompt()
@@ -588,22 +513,16 @@ hover(bid: str)
             active_strategy=self.active_strategy,
         )
 
-        state, status, replan, think = self.encoder(main_prompt)
+        state = self.encoder(main_prompt)
         self.full_output = ''
         self.full_output_dict = {}
 
         logger.info(f'*State*: {state}')
-        logger.info(f'*Replan Reasoning*: {think}')
-        logger.info(f'*Replan Status*: {status}')
 
         self.full_output_dict['obs'] = current_obs
         self.full_output_dict['state'] = state
-        self.full_output_dict['replan_reasoning'] = think
-        self.full_output_dict['replan_status'] = status
 
         self.full_output += f'*State*: {state}\n'
-        self.full_output += f'*Replan Reasoning*: {think}\n'
-        self.full_output += f'*Replan Status*: {status}\n'
 
         # replan = True
         if len(actions) > 1 and actions[-1] == actions[-2]:
@@ -613,7 +532,16 @@ hover(bid: str)
             replan = True
 
         if replan:
-            strategy = self.planning_search(state)
+            # strategy = self.planning_search(state)
+            main_prompt = MyMainPrompt(
+                obs_history=obs_history,
+                states=states,
+                strategies=strategies,
+                # actions=actions,
+                actions=actions,
+            )
+            strategy = policy(main_prompt)
+
             self.strategies.append(strategy)
             self.active_strategy = strategy
             self.active_strategy_turns = 0

@@ -1,0 +1,18 @@
+
+# Concrete Example
+
+Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
+<state>
+The previous action resulted in a timeout error, indicating no changes were made to the page. Thus far, I have visited ABC.com and DEF.com, discovering information G and H, respectively. The current page contains a dialog with id 789 prompting whether to add protection, offering coverage options and the choices "Add Protection" or "No Thanks". A link with id 234 indicates "1 item in cart", revealing a cellphone in the cart with a subtotal of $345. I searched for a 5-night hotel stay, but results only showed availability for a 6-night stay, suggesting a 5-night stay is unavailable. The page displays:
+- An empty textbox with id 123 labeled "Date", indicating it is likely for date input.
+- A button with id 456 labeled "Submit" positioned below textbox 123, suggesting it submits the date entered in the textbox.
+Additionally, there are:
+- A notification with id 101 displaying "Error: Invalid date format" when attempting to submit the date.
+- A dropdown menu with id 102 labeled "Room Type" containing options "Single", "Double", and "Suite".
+- A section with id 103 showing "Total Price: $0.00", implying the total cost updates dynamically based on selections.
+The page did not display any new errors after the latest action, apart from the timeout issue.
+I clicked the "Submit" button on the booking form, but no confirmation message appeared, and the page did not change. There is no indication whether the submission was successful or not. I need to reassess the page for any subtle changes or possible errors.
+</state>
+<progress>
+not-sure
+</progress>

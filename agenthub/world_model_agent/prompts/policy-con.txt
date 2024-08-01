@@ -1,0 +1,7 @@
+
+# Concrete Example
+
+Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
+<strategy>
+Click through the form fields to explore available options and ensure all mandatory fields are completed.
+</strategy>
